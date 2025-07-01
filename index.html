@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Pokecard</title>
+</head>
+
+<body>
+
+    <div class="contenedor">
+        <div class="encabezado">
+            <div class="logo1">
+                <img src="logoslaterales.png">
+            </div>
+            <div class="logo2">
+                <img src="logo.png">
+            </div>
+            <div class="logo3">
+                <img src="logoslaterales.png">
+            </div>
+        </div>
+        <br>
+            <br>
+            <br>
+            <br>
+
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+        <div class="carta">
+            <div class="primeraparte">
+                <div class="primeracarta">
+                    <div class="titulo">
+                        <h1 id="titulo"></h1>
+                    </div>
+                    <div class="numero">
+                        <p id="numero"></p>
+                    </div>
+                </div>
+
+                <img src="" id="pok" alt="">
+
+                <div class="contenedor1">
+                    <div class="altura">
+                        <h2>Altura</h2>
+                        <p id="altura"></p>
+                    </div>
+                    <div class="peso">
+                        <h2>Peso</h2>
+                        <p id="peso"></p>
+                    </div>
+                </div>
+
+                <h2>Tipos</h2>
+                <ul id="tipos"></ul>
+
+                <div class="contenedor2">
+                    <div class="debilidades">
+                        <h2>Debilidades</h2>
+                        <ul id="debilidades"></ul>
+                    </div>
+                    <div class="habilidades">
+                        <h2>Habilidades</h2>
+                        <ul id="habilidades"></ul>
+                    </div>
+                </div>
+            </div>
+            
+
+            <div class="segundaparte">
+                <br>
+            <br>
+            <br>
+            <br>
+                <h2>Estadísticas</h2>
+                <br>
+            <br>
+            
+                <ul id="estadisticas"></ul>
+            </div>
+        </div>
+
+        <script>
+document.addEventListener("DOMContentLoaded", async () => {
+    const randompokemon = Math.floor(Math.random() * 151) + 1;
+    let res = await axios.get("https://pokeapi.co/api/v2/pokemon/" + randompokemon);
+
+    // Datos básicos
+    document.getElementById("titulo").textContent = res.data.name;
+    document.getElementById("pok").src = res.data.sprites.front_default;
+    document.getElementById("altura").textContent = res.data.height;
+    document.getElementById("peso").textContent = res.data.weight;
+    document.getElementById("numero").textContent = "#" + res.data.id;
+
+    const tiposList = document.getElementById("tipos");
+    const tipoUrls = [];
+
+    function getColorByType(tipo) {
+        switch (tipo) {
+            case "normal": return "#D6D6B8";
+            case "fighting": return "#E57A7A";
+            case "flying": return "#D3C3F6";
+            case "poison": return "#D8A2D8";
+            case "ground": return "#F0E0AA";
+            case "rock": return "#E0C878";
+            case "bug": return "#CDE475";
+            case "ghost": return "#BBA3D0";
+            case "steel": return "#D8D8E8";
+            case "fire": return "#FFC48C";
+            case "water": return "#A0C8FF";
+            case "grass": return "#B9EBA3";
+            case "electric": return "#FFF59D";
+            case "psychic": return "#F8B6C8";
+            case "ice": return "#C9F2F2";
+            case "dragon": return "#BFA8F9";
+            case "dark": return "#BCAAA4";
+            case "fairy": return "#F6C1E0";
+            default: return "#F0F0F0";
+        }
+    }
+
+    // Mostrar tipos como botones 
+    res.data.types.forEach(tipo => {
+        let button = document.createElement("button");
+        button.textContent = tipo.type.name;
+        button.style.padding = "6px 12px";
+        button.style.margin = "4px";
+        button.style.border = "none";
+        button.style.borderRadius = "6px";
+        button.style.color = "white";
+        button.style.cursor = "pointer";
+        button.style.backgroundColor = getColorByType(tipo.type.name);
+        tiposList.appendChild(button);
+
+        tipoUrls.push(tipo.type.url);
+    });
+
+    //  Aquí se aplica el degradado 
+    const coloresTipos = res.data.types.map(tipo => getColorByType(tipo.type.name));
+    let fondo;
+
+    if (coloresTipos.length === 1) {
+        fondo = coloresTipos[0];
+    } else {
+        fondo = `linear-gradient(135deg, ${coloresTipos.join(', ')})`;
+    }
+
+    document.querySelector(".primeraparte").style.background = fondo;
+    document.querySelector(".segundaparte").style.background = fondo;
+
+    // Habilidades
+    const habilidadesList = document.getElementById("habilidades");
+    res.data.abilities.forEach(habilidad => {
+        let li = document.createElement("li");
+        li.textContent = habilidad.ability.name;
+        habilidadesList.appendChild(li);
+    });
+
+    // Estadísticas que va en barras
+    const statsList = document.getElementById("estadisticas");
+    res.data.stats.forEach(stat => {
+        let contenedor = document.createElement("div");
+        contenedor.style.marginBottom = "10px";
+
+        let texto = document.createElement("p");
+        texto.textContent = `${stat.stat.name}: ${stat.base_stat}/400`;
+        texto.style.fontWeight = "bold";
+        texto.style.margin = "0 0 5px 0";
+        contenedor.appendChild(texto);
+
+        let barra = document.createElement("div");
+        barra.style.width = "100%";
+        barra.style.height = "20px";
+        barra.style.backgroundColor = "#eee";
+        barra.style.borderRadius = "5px";
+        barra.style.overflow = "hidden";
+
+        let progreso = document.createElement("div");
+        progreso.style.height = "100%";
+        progreso.style.width = `${(stat.base_stat / 400) * 100}%`;
+        progreso.style.backgroundColor = "#1E90FF";
+        progreso.style.transition = "width 0.5s";
+
+        barra.appendChild(progreso);
+        contenedor.appendChild(barra);
+
+        statsList.appendChild(contenedor);
+    });
+
+    // Debilidades
+    const debilidadesList = document.getElementById("debilidades");
+    const debilidadesSet = new Set();
+
+    for (const url of tipoUrls) {
+        let tipoRes = await axios.get(url);
+        tipoRes.data.damage_relations.double_damage_from.forEach(d => {
+            debilidadesSet.add(d.name);
+        });
+    }
+
+    debilidadesSet.forEach(debilidad => {
+        let button = document.createElement("button");
+        button.textContent = debilidad;
+        button.style.padding = "6px 12px";
+        button.style.margin = "4px";
+        button.style.border = "none";
+        button.style.borderRadius = "6px";
+        button.style.backgroundColor = "#e74c3c";
+        button.style.color = "white";
+        button.style.cursor = "pointer";
+        debilidadesList.appendChild(button);
+    });
+});
+</script>
+
+</body>
+
+</html>
