@@ -201,18 +201,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     debilidadesSet.forEach(debilidad => {
-        let button = document.createElement("button");
-        button.textContent = debilidad;
-        button.style.padding = "6px 12px";
-        button.style.margin = "4px";
-        button.style.border = "none";
-        button.style.borderRadius = "6px";
-        button.style.backgroundColor = "#e74c3c";
-        button.style.color = "white";
-        button.style.cursor = "pointer";
-        debilidadesList.appendChild(button);
-    });
+    let button = document.createElement("button");
+    button.textContent = debilidad;
+    button.style.padding = "6px 12px";
+    button.style.margin = "4px";
+    button.style.border = "none";
+    button.style.borderRadius = "6px";
+    button.style.backgroundColor = getColorByType(debilidad); // <--- aquí
+    button.style.color = "white";
+    button.style.cursor = "pointer";
+    debilidadesList.appendChild(button);
 });
+
+    });
+
 </script>
 
 </body>
